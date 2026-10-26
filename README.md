@@ -367,7 +367,7 @@ Setelah menjalankan `php artisan db:seed`, akun berikut tersedia:
 erDiagram
     ROLES {
         bigint id_role PK
-        varchar(50) name UK
+        varchar name UK
         timestamp created_at
         timestamp updated_at
     }
@@ -376,7 +376,7 @@ erDiagram
         bigint id_user PK
         bigint id_role FK
         varchar name
-        varchar(100) username UK
+        varchar username UK
         varchar password
         timestamp created_at
         timestamp updated_at
@@ -384,16 +384,16 @@ erDiagram
 
     ADUAN {
         bigint id_aduan PK
-        varchar(40) kode_tiket UK
+        varchar kode_tiket UK
         text judul_aduan
         text deskripsi_aduan
-        decimal(10_7) latitude
-        decimal(10_7) longitude
+        decimal latitude
+        decimal longitude
         text alamat
-        varchar(20) nohp
-        enum status_aduan "diajukan|diproses|diteruskan|selesai|ditolak"
+        varchar nohp
+        enum status_aduan
         text tanggapan
-        varchar(100) petugas_penanggung_jawab
+        varchar petugas_penanggung_jawab
         datetime waktu_pengaduan
         timestamp created_at
         timestamp updated_at
@@ -401,15 +401,15 @@ erDiagram
 
     PENILAIAN_PRIORITAS {
         bigint id_penilaian PK
-        bigint id_aduan FK_UK
-        decimal(5_2) nilai_urgensi
-        decimal(5_2) nilai_dampak
-        decimal(5_2) nilai_jumlah_warga
-        decimal(5_4) bobot_urgensi "default 0.4000"
-        decimal(5_4) bobot_dampak "default 0.3500"
-        decimal(5_4) bobot_jumlah_warga "default 0.2500"
-        decimal(6_3) skor_prioritas
-        enum tingkat_prioritas "rendah|sedang|tinggi|darurat"
+        bigint id_aduan FK
+        decimal nilai_urgensi
+        decimal nilai_dampak
+        decimal nilai_jumlah_warga
+        decimal bobot_urgensi
+        decimal bobot_dampak
+        decimal bobot_jumlah_warga
+        decimal skor_prioritas
+        enum tingkat_prioritas
         datetime waktu_penilaian
         timestamp created_at
         timestamp updated_at
@@ -417,20 +417,20 @@ erDiagram
 
     TARGET_RESPON {
         bigint id_target PK
-        bigint id_penilaian FK_UK
+        bigint id_penilaian FK
         int batas_respon_menit
         datetime tenggat_respon
         datetime waktu_respon
-        enum status_respon "menunggu|direspons|terlambat"
+        enum status_respon
         timestamp created_at
         timestamp updated_at
     }
 
     LAPORAN {
         bigint id_laporan PK
-        bigint id_aduan FK_UK
-        bigint id_penilaian FK_UK
-        bigint id_target FK_UK
+        bigint id_aduan FK
+        bigint id_penilaian FK
+        bigint id_target FK
         timestamp created_at
         timestamp updated_at
     }
@@ -442,6 +442,21 @@ erDiagram
     PENILAIAN_PRIORITAS ||--o| LAPORAN : "belongs to"
     TARGET_RESPON ||--o| LAPORAN : "belongs to"
 ```
+
+**Detail Tipe Data & Constraint:**
+
+| Tabel | Kolom | Tipe Lengkap | Constraint |
+|-------|-------|-------------|------------|
+| `aduan` | `kode_tiket` | `VARCHAR(40)` | UNIQUE |
+| `aduan` | `latitude` / `longitude` | `DECIMAL(10,7)` | NULLABLE |
+| `aduan` | `status_aduan` | `ENUM('diajukan','diproses','diteruskan','selesai','ditolak')` | DEFAULT `'diajukan'` |
+| `penilaian_prioritas` | `nilai_*` | `DECIMAL(5,2)` | — |
+| `penilaian_prioritas` | `bobot_urgensi` | `DECIMAL(5,4)` | DEFAULT `0.4000` |
+| `penilaian_prioritas` | `bobot_dampak` | `DECIMAL(5,4)` | DEFAULT `0.3500` |
+| `penilaian_prioritas` | `bobot_jumlah_warga` | `DECIMAL(5,4)` | DEFAULT `0.2500` |
+| `penilaian_prioritas` | `skor_prioritas` | `DECIMAL(6,3)` | — |
+| `penilaian_prioritas` | `tingkat_prioritas` | `ENUM('rendah','sedang','tinggi','darurat')` | — |
+| `target_respon` | `status_respon` | `ENUM('menunggu','direspons','terlambat')` | DEFAULT `'menunggu'` |
 
 ### Database View: `v_countdown_respon`
 
